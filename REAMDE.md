@@ -23,22 +23,22 @@ az login
 
 ### Prepare the environment file
 
-Make a copy from the template file and adapt it (i.e. replace TODO-statements):
+Create a `.env` file from the provided template file `.env.template` and update it with your specific configuration (e.g., replace TODO placeholders with actual values):
 
 ```bash
 cp .env.template .env
 ```
-Ensure the Azure account has the necessary permissions:
+Run the following script to verify that your Azure account has the required permissions:
 
 ```bash
-01_ensure_prerequisites.sh
+bash 01_ensure_prerequisites.sh
 ```
 ## Create service
 
 Finally run the following command to create the service:
 
 ```bash
-02_create_service_with_prompt.sh
+bash 02_create_service_with_prompt.sh
 ```
 
 ## License
