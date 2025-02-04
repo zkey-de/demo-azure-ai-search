@@ -6,12 +6,12 @@ source .env
 
 ## 1. Create resources
 
-echo "Create resource group ..."
+echo -e "\nCreate resource group ..."
 if prompt_user; then
     az group create --name $RESOURCE_GROUP --location $LOCATION
 fi
 
-echo "Create a search service..."
+echo -e "\nCreate a search service..."
 if prompt_user; then
     az search service create \
         --name $SERVICE_NAME \
@@ -20,7 +20,7 @@ if prompt_user; then
         --location $LOCATION
 fi
 
-echo "Create a storage account ..."
+echo -e "\nCreate a storage account ..."
 if prompt_user; then
     az storage account create \
         --name $STORAGE_ACCOUNT_NAME \
@@ -29,7 +29,7 @@ if prompt_user; then
         --sku Standard_LRS
 fi
 
-echo "Create a storage container..."
+echo -e "\nCreate a storage container..."
 if prompt_user; then
     STORAGE_KEY=$(az storage account keys list --account-name $STORAGE_ACCOUNT_NAME --resource-group $RESOURCE_GROUP --query [0].value -o tsv)
     az storage container create \
@@ -40,7 +40,7 @@ fi
 
 ## 2. Prepare data
 
-echo "Download sample file and upload it to the storage container ..."
+echo -e "\nDownload sample file and upload it to the storage container ..."
 if prompt_user; then
     curl -o hotels.json $EXAMPLE_DATA_URL
     az storage blob upload \
@@ -52,14 +52,14 @@ if prompt_user; then
         --overwrite
 fi
 
-echo "Download sample file index and upload it to the storage container ..."
+echo -e "\nDownload sample index file and upload it to the storage container ..."
 if prompt_user; then
     curl -o $EXAMPLE_DATA_INDEX_FILENAME $EXAMPLE_DATA_INDEX_URL
 fi
 
 ## 3. Configure search service
 
-echo "Create Data Source using REST API and AAD Authentication..."
+echo -e "\nCreate Data Source using REST API and AAD Authentication..."
 if prompt_user; then
     ACCESS_TOKEN=$(az account get-access-token --resource https://search.azure.com --query accessToken -o tsv)
 
@@ -79,25 +79,25 @@ EOF
     )
 
     curl -X POST \
-        "https://${SERVICE_NAME}.search.windows.net/datasources?api-version=2021-04-30-Preview" \
+        "https://${SERVICE_NAME}.search.windows.net/datasources?api-version=${API_VERSION}" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $ACCESS_TOKEN" \
         -d "${DATA_SOURCE_PAYLOAD}"
 fi
 
-echo "Create index ..."
+echo -e "\nCreate index ..."
 if prompt_user; then
     curl -X POST \
-      "https://${SERVICE_NAME}.search.windows.net/indexes?api-version=2021-04-30-Preview" \
+      "https://${SERVICE_NAME}.search.windows.net/indexes?api-version=${API_VERSION}" \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer $ACCESS_TOKEN" \
       -d @hotels_index.json
 fi
 
-echo "Create indexer ..."
+echo -e "\nCreate indexer ..."
 if prompt_user; then
     curl -X POST \
-      "https://${SERVICE_NAME}.search.windows.net/indexers?api-version=2021-04-30-Preview" \
+      "https://${SERVICE_NAME}.search.windows.net/indexers?api-version=${API_VERSION}" \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer $ACCESS_TOKEN" \
       -d "{
@@ -107,10 +107,10 @@ if prompt_user; then
       }"
 fi
 
-echo "Run indexer ..."
+echo -e "\nRun indexer ..."
 if prompt_user; then
     curl -X POST \
-      "https://${SERVICE_NAME}.search.windows.net/indexers/${INDEXER_NAME}/run?api-version=2021-04-30-Preview" \
+      "https://${SERVICE_NAME}.search.windows.net/indexers/${INDEXER_NAME}/run?api-version=${API_VERSION}" \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer $ACCESS_TOKEN"
 fi
